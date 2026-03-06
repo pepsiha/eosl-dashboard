@@ -11,12 +11,11 @@ import {
   FileText,
   Briefcase,
   Trophy,
-  Medal
+  ChevronRight
 } from 'lucide-react';
 
 /**
- * 數據定義：嚴格對齊最新「測試.xlsx」檔案
- * 已修正 W組 Backlog: 目標 60,882 / 預估 60,448 (達成率 99.29%)
+ * 數據定義：嚴格對齊最新「測試.xlsx」檔案內容
  */
 const rawData = {
   // 全所總結數據 (Summary Cards)
@@ -83,87 +82,107 @@ export default function App() {
   const [currentView, setCurrentView] = useState('business');
 
   const navItems = [
-    { id: 'business', name: '114年度全所企業業務收入概況', icon: LayoutDashboard },
-    { id: 'surplus', name: '業務餘絀概況', icon: TrendingUp },
-    { id: 'research', name: '科專研發成果收入概況', icon: FileText },
-    { id: 'backlog', name: '115 backlog 概況', icon: Briefcase },
+    { id: 'business', name: '企業業務收入', icon: LayoutDashboard },
+    { id: 'surplus', name: '業務餘絀', icon: TrendingUp },
+    { id: 'research', name: '科專研發收入', icon: FileText },
+    { id: 'backlog', name: '115 backlog', icon: Briefcase },
   ];
 
   const currentGroupData = rawData.groups[currentView];
-  const viewTitle = navItems.find(i => i.id === currentView)?.name.replace('概況', '').replace('114年度全所', '');
+  const activeLabel = navItems.find(i => i.id === currentView)?.name;
 
-// 1. 未達標組追蹤 (rate < 100) - 取前三名 (最低)
   const underperforming = [...currentGroupData]
     .filter(g => g.rate < 100)
     .sort((a, b) => a.rate - b.rate)
     .slice(0, 3);
 
-    // 2. 達標優選組 (rate >= 100) - 取前三名 (最高)
   const topPerforming = [...currentGroupData]
     .filter(g => g.rate >= 100)
     .sort((a, b) => b.rate - a.rate)
     .slice(0, 3);
 
   return (
-    <div className="flex h-screen bg-[#f1f5f9] font-sans">
-      {/* 側邊導覽 */}
-      <aside className="w-72 bg-[#0f172a] text-white hidden md:flex flex-col shrink-0 shadow-2xl">
+    <div className="flex h-screen bg-[#f1f5f9] font-sans text-slate-900 overflow-hidden">
+      {/* 側邊導覽 - 僅在電腦版顯示 */}
+      <aside className="w-72 bg-[#0f172a] text-white hidden lg:flex flex-col shrink-0 shadow-2xl">
         <div className="p-6 flex items-center gap-3 border-b border-slate-800">
           <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold">114</div>
-          <h1 className="font-bold text-lg tracking-wider italic">EOSL 財務看板</h1>
+          <h1 className="font-bold text-lg tracking-wider italic">財務看板</h1>
         </div>
-        
         <nav className="flex-1 p-4 space-y-2 mt-4">
-          <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">指標維度切換</p>
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setCurrentView(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all text-left leading-snug ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${
                 currentView === item.id ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'
               }`}
             >
-              <item.icon size={18} className="shrink-0" />
-              <span>{item.name}</span>
+              <item.icon size={18} />
+              <span>{item.name}概況</span>
             </button>
           ))}
         </nav>
-        
-        <div className="p-4 border-t border-slate-800">
-          <div className="text-[10px] text-slate-500 bg-slate-900/50 p-3 rounded-lg border border-slate-800">
-            精確數據源：測試.xlsx
-          </div>
-        </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white border-b flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
-          <h2 className="text-lg font-bold text-slate-800 uppercase flex items-center gap-3">
-            <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-            FY114 財務目標追蹤看板
-          </h2>
-          <div className="flex items-center gap-4 text-slate-500 text-sm">
-            <span className="bg-slate-100 px-2 py-1 rounded-md text-[11px] font-bold text-slate-600 border border-slate-200 uppercase tracking-tighter">單位：千元</span>
-            <Bell size={18} />
+      {/* 主要內容區 */}
+      <main className="flex-1 flex flex-col h-full overflow-hidden">
+        {/* 頂部 Header & 手機版導覽 */}
+        <header className="bg-white border-b shrink-0 z-20">
+          <div className="h-14 lg:h-16 flex items-center justify-between px-4 lg:px-8">
+            <h2 className="text-sm lg:text-lg font-bold text-slate-800 truncate uppercase flex items-center gap-2">
+              <span className="w-1 h-5 bg-blue-600 rounded-full hidden lg:block"></span>
+              FY114 財務追蹤
+            </h2>
+            <div className="flex items-center gap-3 text-slate-500">
+              <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter">單位：千元</span>
+              <Bell size={18} />
+            </div>
+          </div>
+
+          {/* 手機版指標切換列 - 水平滑動 */}
+          <div className="lg:hidden flex overflow-x-auto no-scrollbar border-t bg-slate-50 px-2 py-2 gap-2">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setCurrentView(item.id)}
+                className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                  currentView === item.id 
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
+                  : 'bg-white text-slate-500 border-slate-200 shadow-sm'
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-8 text-slate-900">
-          {/* 四大全所指標卡片 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* 捲動區域 */}
+        <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 lg:space-y-8">
+          
+          {/* 全所四大指標卡片 - 已移除百萬國字，顯示完整數字 */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
             {rawData.overall.map((item) => {
               const isTargetReached = item.rate >= 100;
               const isActive = currentView === item.id;
               return (
-                <div key={item.id} className={`bg-white p-5 border shadow-sm rounded-xl transition-all duration-300 ${isActive ? 'border-blue-500 ring-4 ring-blue-50 scale-[1.03] shadow-md' : 'border-slate-200'}`}>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-tight">{item.title}</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xl font-black text-slate-900 tabular-nums">{item.target.toLocaleString()}</span>
+                <div 
+                  key={item.id} 
+                  className={`bg-white p-3 lg:p-5 border rounded-xl transition-all duration-300 ${
+                    isActive ? 'border-blue-500 ring-2 ring-blue-50 shadow-md' : 'border-slate-100'
+                  }`}
+                >
+                  <p className="text-[9px] lg:text-[11px] font-bold text-slate-400 uppercase mb-0.5 lg:mb-1 truncate">{item.title}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm lg:text-xl font-black text-slate-900 tabular-nums">
+                      {item.target.toLocaleString()}
+                    </span>
                   </div>
-                  <div className="mt-3 flex justify-between items-center border-t border-slate-50 pt-3">
-                    <span className="text-[11px] text-slate-400 font-medium">預估達成率</span>
-                    <span className={`text-sm font-black ${isTargetReached ? 'text-blue-600' : 'text-red-600'}`}>
-                      {item.rate.toFixed(2)}%
+                  <div className="mt-2 lg:mt-3 flex justify-between items-center border-t border-slate-50 pt-2 lg:pt-3">
+                    <span className="text-[8px] lg:text-[10px] text-slate-400 font-medium font-bold">達成</span>
+                    <span className={`text-[11px] lg:text-sm font-black ${isTargetReached ? 'text-blue-600' : 'text-red-600'}`}>
+                      {item.rate.toFixed(1)}%
                     </span>
                   </div>
                 </div>
@@ -171,38 +190,85 @@ export default function App() {
             })}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* 各組達成率圖表 */}
-            <div className="lg:col-span-2 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-              <div className="flex items-center justify-between mb-8 border-b border-slate-50 pb-5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                    <Target size={20} />
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            
+            {/* 左側：排行榜 (電腦版佔 1/3, 手機版排在上方) */}
+            <div className="w-full lg:w-1/3 flex flex-col gap-6 order-1">
+              
+              {/* 達標優選 */}
+              <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm border-t-4 border-t-blue-500">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="text-blue-600" size={18} />
+                    <h3 className="font-bold text-sm lg:text-base">達標優選 (TOP 3)</h3>
                   </div>
-                  <h3 className="font-bold text-slate-800 text-base">各組{viewTitle}達成率</h3>
+                  <ArrowUp size={12} className="text-blue-400" />
+                </div>
+                <div className="space-y-2.5">
+                  {topPerforming.map((group, i) => (
+                    <div key={i} className="flex justify-between items-center p-2.5 bg-blue-50/40 rounded-lg border border-blue-100/50">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black">{i + 1}</span>
+                        <span className="text-sm font-bold text-slate-700">{group.name}</span>
+                      </div>
+                      <span className="text-sm font-black text-blue-600 tabular-nums">{group.rate.toFixed(1)}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 未達標追蹤 */}
+              <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm border-t-4 border-t-red-500">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="text-red-600" size={18} />
+                    <h3 className="font-bold text-sm lg:text-base">關注追蹤 (底 3)</h3>
+                  </div>
+                  <ArrowDown size={12} className="text-red-400" />
+                </div>
+                <div className="space-y-2.5">
+                  {underperforming.map((group, i) => (
+                    <div key={i} className="flex justify-between items-center p-2.5 bg-red-50/40 rounded-lg border border-red-100/50">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-black">{i + 1}</span>
+                        <span className="text-sm font-bold text-slate-700">{group.name}</span>
+                      </div>
+                      <span className="text-sm font-black text-red-600 tabular-nums">{group.rate.toFixed(1)}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 右側：詳細圖表 (電腦版佔 2/3, 手機版排在下方) */}
+            <div className="w-full lg:w-2/3 bg-white border border-slate-200 p-5 lg:p-6 rounded-2xl shadow-sm order-2 overflow-hidden">
+              <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="text-blue-500" size={20} />
+                  <h3 className="font-bold text-slate-800 text-sm lg:text-base">各組{activeLabel}達成率</h3>
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-4 lg:space-y-5">
                 {currentGroupData.map((group, index) => {
                   const isReached = group.rate >= 100;
                   return (
-                    <div key={index} className="group">
-                      <div className="flex justify-between text-[11px] mb-2 px-1 transition-all group-hover:translate-x-1">
-                        <span className="font-bold text-slate-700">{group.name}</span>
-                        <span className="text-slate-400 font-medium tracking-tighter tabular-nums">
-                          目標: {group.target.toLocaleString()} / 預估: {group.actual.toLocaleString()}
+                    <div key={index} className="flex flex-col">
+                      <div className="flex justify-between text-[10px] lg:text-[11px] mb-1.5 px-0.5">
+                        <span className="font-bold text-slate-600">{group.name}</span>
+                        <span className="text-slate-400 tabular-nums">
+                          目標: {group.target.toLocaleString()} / 達成: {group.rate.toFixed(1)}%
                         </span>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1 h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-[1.5px]">
+                      <div className="flex items-center gap-2.5 lg:gap-4">
+                        <div className="flex-1 h-2.5 bg-slate-50 rounded-full border border-slate-100 overflow-hidden p-[1px]">
                           <div 
-                            className={`h-full transition-all duration-1000 ease-out rounded-full ${isReached ? 'bg-blue-600 shadow-sm' : 'bg-red-600 shadow-sm'}`} 
+                            className={`h-full rounded-full transition-all duration-1000 ${isReached ? 'bg-blue-600' : 'bg-red-600'}`} 
                             style={{ width: `${Math.min(group.rate, 100)}%` }}
                           ></div>
                         </div>
-                        <span className={`text-[12px] font-black w-16 text-right tabular-nums ${isReached ? 'text-blue-600' : 'text-red-600'}`}>
-                          {group.rate.toFixed(2)}%
+                        <span className={`text-[11px] lg:text-[12px] font-black w-12 text-right tabular-nums ${isReached ? 'text-blue-600' : 'text-red-600'}`}>
+                          {group.rate.toFixed(1)}%
                         </span>
                       </div>
                     </div>
@@ -211,80 +277,15 @@ export default function App() {
               </div>
             </div>
 
-          {/* 右側：排行榜區塊 */}
-          <div className="flex flex-col gap-8">
-
-              {/* 達標優選組 (前三名) */}
-              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-blue-500">
-                <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                      <Trophy size={20} />
-                    </div>
-                    <h3 className="font-bold text-slate-800">達標優選組 (前三)</h3>
-                  </div>
-                  <ArrowUp size={14} className="text-blue-400" />
-                </div>
-                
-                <div className="space-y-3">
-                  {topPerforming.map((group, i) => (
-                    <div key={i} className="flex justify-between items-center p-3 bg-blue-50/30 rounded-xl border border-blue-100/50">
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-black">
-                          {i + 1}
-                        </span>
-                        <span className="text-sm font-bold text-slate-800">{group.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-black text-blue-600 block tabular-nums">{group.rate.toFixed(2)}%</span>
-                        <span className="text-[10px] text-slate-400 font-medium">超額完成</span>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {topPerforming.length === 0 && (
-                    <p className="text-center text-slate-400 py-4 text-xs">目前暫無組別達標</p>
-                  )}
-                </div>
-              </div>
-
-            {/* 未達標組追蹤 (前三名) */}
-              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-red-500">
-                <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-red-50 text-red-600 rounded-lg">
-                      <AlertTriangle size={20} />
-                    </div>
-                    <h3 className="font-bold text-slate-800">未達標組追蹤 (前三)</h3>
-                  </div>
-                  <ArrowDown size={14} className="text-red-400 animate-bounce" />
-                </div>
-                
-                <div className="space-y-3">
-                  {underperforming.map((group, i) => (
-                    <div key={i} className="flex justify-between items-center p-3 bg-red-50/30 rounded-xl border border-red-100/50">
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-black">
-                          {i + 1}
-                        </span>
-                        <span className="text-sm font-bold text-slate-800">{group.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-black text-red-600 block tabular-nums">{group.rate.toFixed(2)}%</span>
-                        <span className="text-[10px] text-slate-400 font-medium tabular-nums">差額: {(group.target - group.actual).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  ))}
-                
-                {underperforming.length === 0 && (
-                    <p className="text-center text-slate-400 py-4 text-xs">恭喜！全組別皆已達標</p>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>
+
+      {/* 隱藏原生捲軸 (手機滑動優化) */}
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }
