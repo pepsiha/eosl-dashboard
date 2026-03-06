@@ -6,9 +6,12 @@ import {
   Target,
   AlertTriangle,
   ArrowDown,
+  ArrowUp,
   TrendingUp,
   FileText,
-  Briefcase
+  Briefcase,
+  Trophy,
+  Medal
 } from 'lucide-react';
 
 /**
