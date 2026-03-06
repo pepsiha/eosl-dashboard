@@ -208,77 +208,43 @@ export default function App() {
               </div>
             </div>
 
-            {/* 右側：排行榜區塊 */}
-            <div className="flex flex-col gap-8">
+            {/* 右側：未達標組追蹤 */}
+            <div className="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col shadow-sm">
+              <div className="flex items-center justify-between mb-8 border-b border-slate-50 pb-5">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-50 text-red-600 rounded-lg">
+                    <AlertTriangle size={20} />
+                  </div>
+                  <h3 className="font-bold text-slate-800">未達標組追蹤 ({viewTitle})</h3>
+                </div>
+                <ArrowDown size={14} className="text-slate-300 animate-bounce" />
+              </div>
               
-              {/* 達標優選組 (前三名) */}
-              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-blue-500">
-                <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                      <Trophy size={20} />
+              <div className="space-y-3.5 flex-1 text-slate-900">
+                {underperforming.map((group, i) => (
+                  <div key={i} className="flex justify-between items-center p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:bg-red-50/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-black">
+                        {i + 1}
+                      </span>
+                      <span className="text-sm font-bold text-slate-800">{group.name}</span>
                     </div>
-                    <h3 className="font-bold text-slate-800">達標優選組 (前三)</h3>
+                    <div className="text-right">
+                      <span className="text-sm font-black text-red-600 block tabular-nums">{group.rate.toFixed(2)}%</span>
+                      <span className="text-[10px] text-slate-400 font-medium tabular-nums">差額: {(group.target - group.actual).toLocaleString()}</span>
+                    </div>
                   </div>
-                  <ArrowUp size={14} className="text-blue-400" />
-                </div>
+                ))}
                 
-                <div className="space-y-3">
-                  {topPerforming.map((group, i) => (
-                    <div key={i} className="flex justify-between items-center p-3 bg-blue-50/30 rounded-xl border border-blue-100/50">
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-black">
-                          {i + 1}
-                        </span>
-                        <span className="text-sm font-bold text-slate-800">{group.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-black text-blue-600 block tabular-nums">{group.rate.toFixed(2)}%</span>
-                        <span className="text-[10px] text-slate-400 font-medium">超額完成</span>
-                      </div>
+                {underperforming.length === 0 && (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-3 text-center py-24">
+                    <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-2 border-2 border-blue-100">
+                      <Target size={32} />
                     </div>
-                  ))}
-                  
-                  {topPerforming.length === 0 && (
-                    <p className="text-center text-slate-400 py-4 text-xs">目前暫無組別達標</p>
-                  )}
-                </div>
-              </div>
-
-              {/* 未達標組追蹤 (前三名) */}
-              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-red-500">
-                <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-red-50 text-red-600 rounded-lg">
-                      <AlertTriangle size={20} />
-                    </div>
-                    <h3 className="font-bold text-slate-800">未達標組追蹤 (前三)</h3>
+                    <p className="text-sm font-black text-slate-600">全數達標</p>
                   </div>
-                  <ArrowDown size={14} className="text-red-400 animate-bounce" />
-                </div>
-                
-                <div className="space-y-3">
-                  {underperforming.map((group, i) => (
-                    <div key={i} className="flex justify-between items-center p-3 bg-red-50/30 rounded-xl border border-red-100/50">
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-black">
-                          {i + 1}
-                        </span>
-                        <span className="text-sm font-bold text-slate-800">{group.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-black text-red-600 block tabular-nums">{group.rate.toFixed(2)}%</span>
-                        <span className="text-[10px] text-slate-400 font-medium tabular-nums">差額: {(group.target - group.actual).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {underperforming.length === 0 && (
-                    <p className="text-center text-slate-400 py-4 text-xs">恭喜！全組別皆已達標</p>
-                  )}
-                </div>
+                )}
               </div>
-
             </div>
           </div>
         </div>
