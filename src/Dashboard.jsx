@@ -208,6 +208,11 @@ export default function App() {
               </div>
             </div>
 
+          {/* 右側：排行榜區塊 */}
+          <div className="flex flex-col gap-8">
+
+            {/* 達標優選組 (前三名) */}
+
             {/* 未達標組追蹤 (前三名) */}
               <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-red-500">
                 <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
@@ -239,6 +244,7 @@ export default function App() {
                 {underperforming.length === 0 && (
                     <p className="text-center text-slate-400 py-4 text-xs">恭喜！全組別皆已達標</p>
                   )}
+                </div>
               </div>
             </div>
           </div>
