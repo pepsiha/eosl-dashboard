@@ -211,7 +211,39 @@ export default function App() {
           {/* 右側：排行榜區塊 */}
           <div className="flex flex-col gap-8">
 
-            {/* 達標優選組 (前三名) */}
+              {/* 達標優選組 (前三名) */}
+              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-blue-500">
+                <div className="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                      <Trophy size={20} />
+                    </div>
+                    <h3 className="font-bold text-slate-800">達標優選組 (前三)</h3>
+                  </div>
+                  <ArrowUp size={14} className="text-blue-400" />
+                </div>
+                
+                <div className="space-y-3">
+                  {topPerforming.map((group, i) => (
+                    <div key={i} className="flex justify-between items-center p-3 bg-blue-50/30 rounded-xl border border-blue-100/50">
+                      <div className="flex items-center gap-3">
+                        <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-black">
+                          {i + 1}
+                        </span>
+                        <span className="text-sm font-bold text-slate-800">{group.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-black text-blue-600 block tabular-nums">{group.rate.toFixed(2)}%</span>
+                        <span className="text-[10px] text-slate-400 font-medium">超額完成</span>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {topPerforming.length === 0 && (
+                    <p className="text-center text-slate-400 py-4 text-xs">目前暫無組別達標</p>
+                  )}
+                </div>
+              </div>
 
             {/* 未達標組追蹤 (前三名) */}
               <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-red-500">
